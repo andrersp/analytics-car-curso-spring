@@ -13,6 +13,11 @@ services:
       - POSTGRES_PASSWORD=analytics
     networks:
       - database_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   api:
     build:
@@ -26,7 +31,8 @@ services:
       - 8086:8080
     env_file: .env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 networks:
   net_api:
